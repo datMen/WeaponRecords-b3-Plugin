@@ -35,6 +35,49 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             # Call the function that process kill event
             self.someoneKilled(event.client, event.target, event.data)
             
+    def findWeapon(self, weapon)
+        if (weapon == "sr8") or (weapon == "SR8"):
+            name = "Remington Sr8"
+            key = "sr8"
+        elif (weapon == "knife") or (weapon == "KNIFE") or (weapon == "KN") or (weapon == "kn"):
+            name = "Knife"
+            key = "knife"
+        elif (weapon == "spas") or (weapon == "SPAS") or (weapon == "FRANCHI") or (weapon == "franchi"):
+            name = "Franchi SPAS12"
+            key = ""
+        elif (weapon == "mp5") or (weapon == "MP5") or (weapon == "MP5K") or (weapon == "mp5k"):
+            name = "HK MP5K"
+            key = "mp5k"
+        elif (weapon == "ump") or (weapon == "UMP") or (weapon == "UMP45") or (weapon == "ump45"):
+            name = "HK UMP45"
+            key = "ump"
+        elif (weapon == "HK69") or (weapon == "hk69") or (weapon == "hk") or (weapon == "HK"):
+            name = "HK69 40mm"
+            key = "hk"
+        elif (weapon == "lr300") or (weapon == "LR300") or (weapon == "LR") or (weapon == "lr"):
+            name = "ZM LR300"
+            key = "lr"
+        elif (weapon == "PSG") or (weapon == "psg") or (weapon == "PSG1") or (weapon == "psg1"):
+            name = "HK PSG1"
+            key = "psg"
+        elif (weapon == "g36") or (weapon == "G36"):
+            name = "HK G36"
+            key = "g36"
+        elif (weapon == "ak") or (weapon == "AK") or (weapon == "AK103") or (weapon == "ak103"):
+            name = "AK103 7.62mm"
+            key = "ak"
+        elif (weapon == "NEGEV") or (weapon == "negev") or (weapon == "NE") or (weapon == "ne"):
+            name = "IMI Negev"
+            key = "negev"
+        elif (weapon == "M4") or (weapon == "m4") or (weapon == "m4a") or (weapon == "M4A"):
+            name = "Colt M4A1"
+            key = "m4a1"
+        elif (weapon == "grenade") or (weapon == "GRENADE") or (weapon == "HE") or (weapon == "he"):
+            name = "HE Grenade"
+            key = "he"
+            
+        return name, key
+            
     def someoneKilled(self, client, target, data=None):
         """\
         Update database weapons for the attacker(killer)
@@ -64,6 +107,9 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             self.console.storage.query('UPDATE `weaponrecord` SET `psg` = psg+1 WHERE client_id = "%s"' % (client.id))
             
         elif data[1] == self.console.UT_MOD_MP5K:
+            self.console.storage.query('UPDATE `weaponrecord` SET `mp5k` = mp5k+1 WHERE client_id = "%s"' % (client.id))
+            
+        elif data[1] == self.console.UT_MOD_UMP45:
             self.console.storage.query('UPDATE `weaponrecord` SET `ump` = ump+1 WHERE client_id = "%s"' % (client.id))
             
         elif data[1] == self.console.UT_MOD_HEGRENADE:
