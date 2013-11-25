@@ -2,7 +2,7 @@ __author__  = 'LouK'
 __version__ = '1.0'
 
 
-import b3
+import b3, threading, thread
 import b3.events
 import b3.plugin
 
@@ -35,7 +35,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             # Call the function that process kill event
             self.someoneKilled(event.client, event.target, event.data)
             
-    def findWeapon(self, weapon)
+    def findWeapon(self, weapon):
         if (weapon == "sr8") or (weapon == "SR8"):
             name = "Remington Sr8"
             key = "sr8"
@@ -44,7 +44,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             key = "knife"
         elif (weapon == "spas") or (weapon == "SPAS") or (weapon == "FRANCHI") or (weapon == "franchi"):
             name = "Franchi SPAS12"
-            key = ""
+            key = "spas"
         elif (weapon == "mp5") or (weapon == "MP5") or (weapon == "MP5K") or (weapon == "mp5k"):
             name = "HK MP5K"
             key = "mp5k"
@@ -145,3 +145,34 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         else:
             stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon[1], client.id))
             cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon[0], client.exactName, stats))
+           
+    def cmd_weaponrecords(self, data, client, cmd=None):
+        """\
+        <weapon> - list the top 3 players with the selected weapon
+        """
+        if not data:
+            client.message('Invalid syntax, try !h weaponrecords')
+            return False
+        
+        input = self._adminPlugin.parseUserCmd(data)
+        thread.start_new_thread(self.doTopList, (data, client, self.findweapon(input[0]), cmd))
+    
+    def doTopList(self, data, client, weapon, cmd=None):
+            
+        q=('SELECT c.id, c.name, w.* FROM weaponrecord w, clients c  WHERE c.id = w.client_id  ORDER BY w.%s DESC LIMIT 0, 3' % (weapon[1]))
+        cursor = self.console.storage.query(q)
+        if cursor and (cursor.rowcount > 0):
+            message = '^2%s ^7Top ^53 ^7Kills:' % (weapon[0])
+            cmd.sayLoudOrPM(client, message)
+            i = 1
+            while not cursor.EOF:
+                r = cursor.getRow()
+                name = r['name']
+                score = r[weapon[1]]
+                message = '^3# %s: ^7%s : ^2%s ^7Kills' % (i, name, score)
+                cmd.sayLoudOrPM(client, message)
+                cursor.moveNext()
+                i += 1
+                time.sleep(1)
+
+        return
