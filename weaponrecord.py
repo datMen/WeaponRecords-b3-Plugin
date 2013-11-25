@@ -94,7 +94,8 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         cname = input[1]
         if cname:
             sclient = self._adminPlugin.findClientPrompt(cname, client)
-            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon, client.id))
+            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon, sclient.id))
             cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon, sclient.exactName, stats))
         else:
-        
+            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon, client.id))
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon, client.exactName, stats))
