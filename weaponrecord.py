@@ -80,3 +80,21 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             
         elif data[1] == self.console.UT_MOD_AK103:
             self.console.storage.query('UPDATE `weaponrecord` SET `ak` = ak+1 WHERE client_id = "%s"' % (client.id))
+            
+    def cmd_weaponstats(self, data, client, cmd=None):
+        """\
+        <weapon> - Check your weapon stats. <player> to check other's stats
+        """
+        if not data:
+            client.message('Invalid syntax, try !h weaponstats')
+            return False
+        
+        input = self._adminPlugin.parseUserCmd(data)
+        weapon = input[0]
+        cname = input[1]
+        if cname:
+            sclient = self._adminPlugin.findClientPrompt(cname, client)
+            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon, client.id))
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon, sclient.exactName, stats))
+        else:
+        
