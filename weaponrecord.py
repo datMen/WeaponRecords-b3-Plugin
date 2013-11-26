@@ -35,7 +35,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             # Call the function that process kill event
             self.someoneKilled(event.client, event.target, event.data)
             
-    def findWeapon(self, weapon):
+    def findWeapon(self, weapon, client):
         if (weapon == "sr8") or (weapon == "SR8"):
             name = "Remington Sr8"
             key = "sr8"
@@ -75,6 +75,9 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         elif (weapon == "grenade") or (weapon == "GRENADE") or (weapon == "HE") or (weapon == "he"):
             name = "HE Grenade"
             key = "he"
+        else:
+            client.message('^2%s ^7is not a weapon' % weapon)
+            return False
             
         return name, key
             
@@ -136,7 +139,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             return False
         
         input = self._adminPlugin.parseUserCmd(data)
-        weapon = self.findweapon(input[0])
+        weapon = self.findWeapon(input[0], client)
         cname = input[1]
         if cname:
             sclient = self._adminPlugin.findClientPrompt(cname, client)
@@ -155,7 +158,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             return False
         
         input = self._adminPlugin.parseUserCmd(data)
-        thread.start_new_thread(self.doTopList, (data, client, self.findweapon(input[0]), cmd))
+        thread.start_new_thread(self.doTopList, (data, client, self.findWeapon(input[0], client), cmd))
     
     def doTopList(self, data, client, weapon, cmd=None):
             
