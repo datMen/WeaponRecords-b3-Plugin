@@ -157,11 +157,15 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         cname = input[1]
         if cname:
             sclient = self._adminPlugin.findClientPrompt(cname, client)
-            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon[1], sclient.id))
-            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon[0], sclient.exactName, stats))
+            cursor = self.console.storage.query('SELECT * FROM weaponrecord WHERE client_id = "%s"' % (sclient.id))
+            r = cursor.getRow()
+            stats = r[weapon[1]]
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s' % (weapon[0], sclient.exactName, stats))
         else:
-            stats = self.console.storage.query('SELECT %s FROM weaponstats WHERE client_id = "%s"' % (weapon[1], client.id))
-            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: %s' % (weapon[0], client.exactName, stats))
+            cursor = self.console.storage.query('SELECT * FROM weaponrecord WHERE client_id = "%s"' % (client.id))
+            r = cursor.getRow()
+            stats = r[weapon[1]]
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s' % (weapon[0], client.exactName, stats))
            
     def cmd_weaponrecords(self, data, client, cmd=None):
         """\
