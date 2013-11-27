@@ -179,9 +179,11 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         thread.start_new_thread(self.doTopList, (data, client, self.findWeapon(input[0], client), cmd))
     
     def doTopList(self, data, client, weapon, cmd=None):
-            
-        q=('SELECT c.id, c.name, w.* FROM weaponrecord w, clients c  WHERE c.id = w.client_id  ORDER BY w.%s DESC LIMIT 0, 3' % (weapon[1]))
-        cursor = self.console.storage.query(q)
+        cursor = self.console.storage.query("""SELECT c.id, c.name, w.* 
+                                            FROM weaponrecord w, clients c  
+                                            WHERE c.id = w.client_id 
+                                            AND c.id NOT IN ( SELECT distinct(c.id) FROM penalties p, clients c WHERE (p.type = "Ban" OR p.type = "TempBan") AND inactive = 0 AND p.client_id = c.id  AND ( p.time_expire = -1 OR p.time_expire > UNIX_TIMESTAMP(NOW()) ) )
+                                            ORDER BY w.%s DESC LIMIT 0, 3""" % (weapon[1]))
         if cursor and (cursor.rowcount > 0):
             message = '^2%s ^7Top ^53 ^7Kills:' % (weapon[0])
             cmd.sayLoudOrPM(client, message)
