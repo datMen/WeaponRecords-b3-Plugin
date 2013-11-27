@@ -17,7 +17,7 @@ This plugin saves every kill made with every weapon at the b3's database. You ca
 ### Commands -
 
 #### !weaponstats (!wstats)
-> <weapon> - Check your weapon stats. <player> to check other's stats
+> &lt;weapon&gt; - Check your weapon stats. &lt;player&gt; to check other's stats
 
 #### !weaponrecords (!wrecords)
-> <weapon> - list the top 3 players with the selected weapon
+> &lt;weapon&gt; - list the top 3 players with the selected weapon
