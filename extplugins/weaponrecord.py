@@ -165,7 +165,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             cursor = self.console.storage.query('SELECT * FROM weaponrecord WHERE client_id = "%s"' % (client.id))
             r = cursor.getRow()
             stats = r[weapon[1]]
-            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s' % (weapon[0], client.exactName, stats))
+            cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s' % (stats, weapon[0]))
            
     def cmd_weaponrecords(self, data, client, cmd=None):
         """\
@@ -197,7 +197,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                                             AND c.id NOT IN ( SELECT distinct(c.id) FROM penalties p, clients c WHERE (p.type = "Ban" OR p.type = "TempBan") AND inactive = 0 AND p.client_id = c.id  AND ( p.time_expire = -1 OR p.time_expire > UNIX_TIMESTAMP(NOW()) ) )
                                             ORDER BY w.%s DESC LIMIT 0, %s""" % (weapon[1], limit))
         if cursor and (cursor.rowcount > 0):
-            message = '^2%s ^7Top ^53 ^7Kills:' % (weapon[0])
+            message = '^2%s ^7Top ^5%s ^7Kills:' % (weapon[0], limit)
             cmd.sayLoudOrPM(client, message)
             i = 1
             while not cursor.EOF:
