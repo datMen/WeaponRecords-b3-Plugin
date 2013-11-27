@@ -11,6 +11,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
         self.registerEvent(b3.events.EVT_CLIENT_AUTH)
+        self.registerEvent(b3.events.EVT_GAME_ROUND_START)
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
             self.error('Could not find admin plugin')
@@ -31,6 +32,8 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 if func:
                     self._adminPlugin.registerCommand(self, cmd, level, func, alias)
                     
+        self.checkmap()
+                    
     def onEvent(self, event):
         if event.type == b3.events.EVT_CLIENT_KILL:
             # Call the function that process kill event
@@ -40,7 +43,20 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             cursor = self.console.storage.query('SELECT * FROM `weaponrecord` WHERE `client_id` = "%s"' % (sclient.id))
             if cursor.rowcount == 0:
                 self.console.storage.query('INSERT INTO `weaponrecord`(`client_id`) VALUES (%s)' % (sclient.id))
-            
+        elif event.type == b3.events.EVT_GAME_ROUND_START:
+            self.checkmap()
+                
+    def checkmap(self):
+        map = self.console.getCvar('mapname').getString()
+        cursor = self.console.storage.query('SELECT * FROM `weaponrecord`')
+        r = cursor.getRow()
+        try:
+            mapname = r[map]
+        except KeyError:
+            q=('ALTER TABLE weaponrecord ADD COLUMN  %s int(100) DEFAULT 0' % map)
+            self.debug(q)
+            self.console.storage.query(q)
+        
     def getCmd(self, cmd):
         cmd = 'cmd_%s' % cmd
         if hasattr(self, cmd):
