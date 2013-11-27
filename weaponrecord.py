@@ -41,6 +41,14 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             if cursor.rowcount == 0:
                 self.console.storage.query('INSERT INTO `weaponrecord`(`client_id`) VALUES (%s)' % (sclient.id))
             
+    def getCmd(self, cmd):
+        cmd = 'cmd_%s' % cmd
+        if hasattr(self, cmd):
+            func = getattr(self, cmd)
+            return func
+
+        return None
+            
     def findWeapon(self, weapon, client):
         if (weapon == "sr8") or (weapon == "SR8"):
             name = "Remington Sr8"
