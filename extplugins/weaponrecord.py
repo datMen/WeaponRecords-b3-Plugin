@@ -53,42 +53,63 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         if (weapon == "sr8") or (weapon == "SR8"):
             name = "Remington Sr8"
             key = "sr8"
+            pos = 10
         elif (weapon == "knife") or (weapon == "KNIFE") or (weapon == "KN") or (weapon == "kn"):
             name = "Knife"
             key = "knife"
+            pos = 0
+        elif (weapon == "beretta") or (weapon == "BERETTA") or (weapon == "BE") or (weapon == "be"):
+            name = "Beretta"
+            key = "beretta"
+            pos = 1
+        elif (weapon == "desert eagle") or (weapon == "DESERT EAGLE") or (weapon == "desert") or (weapon == "DESERT") or (weapon == "DE") or (weapon == "de"):
+            name = "Desert Eagle"
+            key = "desert"
+            pos = 2
         elif (weapon == "spas") or (weapon == "SPAS") or (weapon == "FRANCHI") or (weapon == "franchi"):
             name = "Franchi SPAS12"
             key = "spas"
+            pos = 3
         elif (weapon == "mp5") or (weapon == "MP5") or (weapon == "MP5K") or (weapon == "mp5k"):
             name = "HK MP5K"
             key = "mp5k"
+            pos = 5
         elif (weapon == "ump") or (weapon == "UMP") or (weapon == "UMP45") or (weapon == "ump45"):
             name = "HK UMP45"
             key = "ump"
+            pos = 4
         elif (weapon == "HK69") or (weapon == "hk69") or (weapon == "hk") or (weapon == "HK"):
             name = "HK69 40mm"
             key = "hk"
+            pos = 13
         elif (weapon == "lr300") or (weapon == "LR300") or (weapon == "LR") or (weapon == "lr"):
             name = "ZM LR300"
             key = "lr"
+            pos = 6
         elif (weapon == "PSG") or (weapon == "psg") or (weapon == "PSG1") or (weapon == "psg1"):
             name = "HK PSG1"
             key = "psg"
+            pos = 11
         elif (weapon == "g36") or (weapon == "G36"):
             name = "HK G36"
             key = "g36"
+            pos = 9
         elif (weapon == "ak") or (weapon == "AK") or (weapon == "AK103") or (weapon == "ak103"):
             name = "AK103 7.62mm"
             key = "ak"
+            pos = 8
         elif (weapon == "NEGEV") or (weapon == "negev") or (weapon == "NE") or (weapon == "ne"):
             name = "IMI Negev"
             key = "negev"
+            pos = 12
         elif (weapon == "M4") or (weapon == "m4") or (weapon == "m4a") or (weapon == "M4A"):
             name = "Colt M4A1"
             key = "m4a1"
+            pos = 7
         elif (weapon == "grenade") or (weapon == "GRENADE") or (weapon == "HE") or (weapon == "he"):
             name = "HE Grenade"
             key = "he"
+            pos = 14
         else:
             client.message('^2%s ^7is not a weapon' % weapon)
             return False
