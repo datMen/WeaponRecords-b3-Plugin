@@ -120,51 +120,49 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         """\
         Update database weapons for the attacker(killer)
         """
-        if data[1] == self.console.UT_MOD_KNIFE or self.console.UT_MOD_KNIFE_THROWN:
-            self.console.storage.query('UPDATE `weaponrecord` SET `knife` = knife+1 WHERE client_id = "%s"' % (client.id))
-            
+        if data[1] == self.console.UT_MOD_KNIFE:
+            key = "kn"
+        elif data[1] == self.console.UT_MOD_KNIFE_THROWN:
+            key = "kn"
         elif data[1] == self.console.UT_MOD_DEAGLE:
-            self.console.storage.query('UPDATE `weaponrecord` SET `desert` = desert+1 WHERE client_id = "%s"' % (client.id))
-
+            key = "de"
         elif data[1] == self.console.UT_MOD_BERETTA:
-            self.console.storage.query('UPDATE `weaponrecord` SET `beretta` = beretta+1 WHERE client_id = "%s"' % (client.id))
-
+            key = "beretta"
         elif data[1] == self.console.UT_MOD_NEGEV:
-            self.console.storage.query('UPDATE `weaponrecord` SET `negev` = negev+1 WHERE client_id = "%s"' % (client.id))
-
+            key = "negev"
         elif data[1] == self.console.UT_MOD_SPAS:
-            self.console.storage.query('UPDATE `weaponrecord` SET `spas` = spas+1 WHERE client_id = "%s"' % (client.id))
-
-        elif data[1] == self.console.UT_MOD_HK69 or self.console.UT_MOD_HK69_HIT:
-            self.console.storage.query('UPDATE `weaponrecord` SET `hk` = hk+1 WHERE client_id = "%s"' % (client.id))
-
+            key = "spas"
+        elif data[1] == self.console.UT_MOD_HK69:
+            key = "hk"
+        elif data[1] == self.console.UT_MOD_HK69_HIT:
+            key = "hk"
         elif data[1] == self.console.UT_MOD_SR8:
-            self.console.storage.query('UPDATE `weaponrecord` SET `psg` = psg+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "sr8"
         elif data[1] == self.console.UT_MOD_PSG1:
-            self.console.storage.query('UPDATE `weaponrecord` SET `psg` = psg+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "psg"
         elif data[1] == self.console.UT_MOD_MP5K:
-            self.console.storage.query('UPDATE `weaponrecord` SET `mp5k` = mp5k+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "mp5"
         elif data[1] == self.console.UT_MOD_UMP45:
-            self.console.storage.query('UPDATE `weaponrecord` SET `ump` = ump+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "ump"
         elif data[1] == self.console.UT_MOD_HEGRENADE:
-            self.console.storage.query('UPDATE `weaponrecord` SET `he` = he+1 WHERE client_id = "%s"' % (client.id))
-        
+            key = "he"
         elif data[1] == self.console.UT_MOD_LR300:
-            self.console.storage.query('UPDATE `weaponrecord` SET `lr300` = lr300+1 WHERE client_id = "%s"' % (client.id))
-        
+            key = "lr"
         elif data[1] == self.console.UT_MOD_M4:
-            self.console.storage.query('UPDATE `weaponrecord` SET `m4` = m4a1+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "m4"
         elif data[1] == self.console.UT_MOD_G36:
-            self.console.storage.query('UPDATE `weaponrecord` SET `g36` = g36+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "g36"
         elif data[1] == self.console.UT_MOD_AK103:
-            self.console.storage.query('UPDATE `weaponrecord` SET `ak` = ak+1 WHERE client_id = "%s"' % (client.id))
-            
+            key = "ak"
+        else:
+            return False
+        
+        weapon = self.findWeapon(key, client)
+        key1 = weapon[1]
+        key2 = weapon[1]
+        q=("UPDATE weaponrecord SET `%s` = %s+1 WHERE client_id = '%s'" % (key1, key2, client.id))
+        self.debug(q)
+        self.console.storage.query(q)
     def cmd_weaponstats(self, data, client, cmd=None):
         """\
         <weapon> - Check your weapon stats. <player> to check other's stats
