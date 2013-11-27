@@ -2,7 +2,7 @@ __author__  = 'LouK'
 __version__ = '1.0'
 
 
-import b3, threading, thread, time
+import b3, threading, thread, time, re
 import b3.events
 import b3.plugin
 
@@ -176,14 +176,26 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             return False
         
         input = self._adminPlugin.parseUserCmd(data)
-        thread.start_new_thread(self.doTopList, (data, client, self.findWeapon(input[0], client), cmd))
+        if input[1]:
+            regex = re.compile(r"""^(?P<string>\w+) (?P<number>\d+)$""");
+            match = regex.match(data)
+
+            weapon = self.findWeapon(match.group('string'), client)
+            limit = int(match.group('number'))
+        else:
+            weapon = self.findWeapon(input[0], client)
+            limit = 3
+        
+        thread.start_new_thread(self.doTopList, (data, limit, client, weapon, cmd))
     
-    def doTopList(self, data, client, weapon, cmd=None):
+    def doTopList(self, data, limit, client, weapon, cmd=None):
+        if limit > 10:
+            limit = 10
         cursor = self.console.storage.query("""SELECT c.id, c.name, w.* 
                                             FROM weaponrecord w, clients c  
                                             WHERE c.id = w.client_id 
                                             AND c.id NOT IN ( SELECT distinct(c.id) FROM penalties p, clients c WHERE (p.type = "Ban" OR p.type = "TempBan") AND inactive = 0 AND p.client_id = c.id  AND ( p.time_expire = -1 OR p.time_expire > UNIX_TIMESTAMP(NOW()) ) )
-                                            ORDER BY w.%s DESC LIMIT 0, 3""" % (weapon[1]))
+                                            ORDER BY w.%s DESC LIMIT 0, %s""" % (weapon[1], limit))
         if cursor and (cursor.rowcount > 0):
             message = '^2%s ^7Top ^53 ^7Kills:' % (weapon[0])
             cmd.sayLoudOrPM(client, message)
