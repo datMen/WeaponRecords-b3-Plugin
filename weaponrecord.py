@@ -10,6 +10,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
  
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
+        self.registerEvent(b3.events.EVT_CLIENT_AUTH)
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
             self.error('Could not find admin plugin')
@@ -34,6 +35,11 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         if event.type == b3.events.EVT_CLIENT_KILL:
             # Call the function that process kill event
             self.someoneKilled(event.client, event.target, event.data)
+        elif event.type == b3.events.EVT_CLIENT_AUTH: 
+            sclient = event.client
+            cursor = self.console.storage.query('SELECT * FROM `weaponrecord` WHERE `client_id` = "%s"' % (sclient.id))
+            if cursor.rowcount == 0:
+                self.console.storage.query('INSERT INTO `weaponrecord`(`client_id`) VALUES (%s)' % (sclient.id))
             
     def findWeapon(self, weapon, client):
         if (weapon == "sr8") or (weapon == "SR8"):
