@@ -8,11 +8,13 @@ import b3.plugin
 
 class WeaponrecordPlugin(b3.plugin.Plugin):
     _map = ""
+    _client_map = ""
  
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
         self.registerEvent(b3.events.EVT_CLIENT_AUTH)
         self.registerEvent(b3.events.EVT_GAME_ROUND_START)
+        self.registerEvent(b3.events.EVT_GAME_EXIT)
         self._adminPlugin = self.console.getPlugin('admin')
         if not self._adminPlugin:
             self.error('Could not find admin plugin')
@@ -39,13 +41,30 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         if event.type == b3.events.EVT_CLIENT_KILL:
             # Call the function that process kill event
             self.someoneKilled(event.client, event.target, event.data)
+            
         elif event.type == b3.events.EVT_CLIENT_AUTH: 
             sclient = event.client
             cursor = self.console.storage.query('SELECT * FROM `weaponrecord` WHERE `client_id` = "%s"' % (sclient.id))
             if cursor.rowcount == 0:
                 self.console.storage.query('INSERT INTO `weaponrecord`(`client_id`) VALUES (%s)' % (sclient.id))
+                
         elif event.type == b3.events.EVT_GAME_ROUND_START:
             self.checkmap()
+            
+        elif event.type == b3.events.EVT_GAME_EXIT:
+            for c in self.console.clients.getClientsByLevel():
+                mapstats = getMapStats(c)
+                fstats = "%s" % (((("".join("%s" % mapstats.stats)).replace(",", "")).replace("[", "")).replace("]", ""))
+                self.console.storage.query('UPDATE weaponrecord SET %s = "%s" WHERE client.id = "%s"' % (self._map, fstats, c.id))
+                sql = self.console.storage.query('SELECT %s FROM weaponrecord WHERE client.id = "%s"' % (self._map, c.id))
+                regex = re.compile(r"""^(?P<stats0>\d+) (?P<stats1>\d+) (?P<stats2>\d+) (?P<stats3>\d+) (?P<stats4>\d+) (?P<stats5>\d+) (?P<stats6>\d+) (?P<stats7>\d+) (?P<stats8>\d+) (?P<stats9>\d+) (?P<stats10>\d+) (?P<stats11>\d+) (?P<stats12>\d+) (?P<stats13>\d+) (?P<stats14>\d+)$""");
+                match = regex.match(sql)
+                stats = []
+                i = 0
+                while i <= 14:
+                    stats.insert(1, (int(match.group('stats%s' % i))))
+                    i += 1
+                mapstats.stats = stats
                 
     def checkmap(self):
         self._map = self.console.getCvar('mapname').getString()
@@ -56,6 +75,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         except KeyError:
             self.console.storage.query('ALTER TABLE weaponrecord ADD COLUMN  %s int(100) DEFAULT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' % (self._map))
         
+    def getMapStats(self, client):
+        
+        if not client.isvar(self, self._clientvar_map):
+            client.setvar(self, self._clientvar_map, MapStats())
+            
+        return client.var(self, self._clientvar_map).value
+    
     def getCmd(self, cmd):
         cmd = 'cmd_%s' % cmd
         if hasattr(self, cmd):
@@ -175,9 +201,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         weapon = self.findWeapon(key, client)
         key1 = weapon[1]
         key2 = weapon[1]
+        pos = weapon[2]
         q=("UPDATE weaponrecord SET `%s` = %s+1 WHERE client_id = '%s'" % (key1, key2, client.id))
         self.debug(q)
         self.console.storage.query(q)
+        mapstats = getMapStats(client)
+        mapstats.stats[pos] += 1
+        
     def cmd_weaponstats(self, data, client, cmd=None):
         """\
         <weapon> - Check your weapon stats. <player> to check other's stats
@@ -245,3 +275,6 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 time.sleep(1)
 
         return
+        
+class MapStats():
+    stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
