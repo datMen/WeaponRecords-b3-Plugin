@@ -45,3 +45,31 @@ CREATE TABLE IF NOT EXISTS `weaponrecord` (
   `he` int(100) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `weaponmaprecord`
+--
+
+CREATE TABLE IF NOT EXISTS `weaponmaprecord` (
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `map` int(100) NOT NULL,
+  `client_id` int(100) NOT NULL,
+  `knife` int(100) NOT NULL DEFAULT '0',
+  `beretta` int(100) NOT NULL DEFAULT '0',
+  `desert` int(100) NOT NULL DEFAULT '0',
+  `spas` int(100) NOT NULL DEFAULT '0',
+  `ump` int(100) NOT NULL DEFAULT '0',
+  `mp5k` int(100) NOT NULL DEFAULT '0',
+  `lr300` int(100) NOT NULL DEFAULT '0',
+  `m4a1` int(100) NOT NULL DEFAULT '0',
+  `ak` int(100) NOT NULL DEFAULT '0',
+  `g36` int(100) NOT NULL DEFAULT '0',
+  `sr8` int(100) NOT NULL DEFAULT '0',
+  `psg` int(100) NOT NULL DEFAULT '0',
+  `negev` int(100) NOT NULL DEFAULT '0',
+  `hk` int(100) NOT NULL DEFAULT '0',
+  `he` int(100) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
