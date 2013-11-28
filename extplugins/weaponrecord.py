@@ -7,6 +7,7 @@ import b3.events
 import b3.plugin
 
 class WeaponrecordPlugin(b3.plugin.Plugin):
+    _map = ""
  
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
@@ -47,15 +48,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             self.checkmap()
                 
     def checkmap(self):
-        map = self.console.getCvar('mapname').getString()
+        self._map = self.console.getCvar('mapname').getString()
         cursor = self.console.storage.query('SELECT * FROM `weaponrecord`')
         r = cursor.getRow()
         try:
-            mapname = r[map]
+            mapname = r[self._map]
         except KeyError:
-            q=('ALTER TABLE weaponrecord ADD COLUMN  %s int(100) DEFAULT 0' % map)
-            self.debug(q)
-            self.console.storage.query(q)
+            self.console.storage.query('ALTER TABLE weaponrecord ADD COLUMN  %s int(100) DEFAULT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' % (self._map))
         
     def getCmd(self, cmd):
         cmd = 'cmd_%s' % cmd
