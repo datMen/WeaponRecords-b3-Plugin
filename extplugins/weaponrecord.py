@@ -86,7 +86,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         try:
             mapname = r[self._map]
         except KeyError:
-            self.console.storage.query('ALTER TABLE weaponrecord ADD COLUMN  %s int(100) DEFAULT 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0' % (self._map))
+            self.console.storage.query('ALTER TABLE weaponrecord ADD COLUMN  %s varchar(100) DEFAULT "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"' % (self._map))
         
     def getMapStats(self, client):
         
@@ -168,7 +168,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             client.message('^2%s ^7is not a weapon' % weapon)
             return False
             
-        return name, key
+        return name, key, pos
             
     def someoneKilled(self, client, target, data=None):
         """\
@@ -243,6 +243,27 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             r = cursor.getRow()
             stats = r[weapon[1]]
             cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s' % (stats, weapon[0]))
+            
+    def cmd_weaponmapstats(self, data, client, cmd=None):
+        """\
+        <weapon> - Check your weapon stats FOR THE CURRENT MAP. <player> to check other's stats
+        """
+        if not data:
+            client.message('Invalid syntax, try !h weaponmapstats')
+            return False
+        
+        input = self._adminPlugin.parseUserCmd(data)
+        weapon = self.findWeapon(input[0], client)
+        cname = input[1]
+        if cname:
+            sclient = self._adminPlugin.findClientPrompt(cname, client)
+            mapstats = self.getMapStats(sclient)
+            
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s ^7at ^3%s' % (weapon[0], sclient.exactName, mapstats.stats[weapon[2]], self._map))
+        else:
+            mapstats = self.getMapStats(client)
+            
+            cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (mapstats.stats[weapon[2]], weapon[0], self._map))
            
     def cmd_weaponrecords(self, data, client, cmd=None):
         """\
