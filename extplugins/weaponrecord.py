@@ -63,17 +63,12 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 for i in self._weapons:
                     weapon = self.findWeapon(i, c)
                     cstats = mapstats[weapon[2]]
-                    q = ('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, c.id, weapon[1]))
                     cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, c.id, weapon[1]))
-                    self.debug(q)
-                    self.debug(cursor)
                     r = cursor.getRow()
                     kills = r['kills']
-                    self.debug("kills: %s cstats: %s" % (kills, cstats))
                     if cstats > kills:
                         self.console.storage.query('UPDATE weaponmaprecord SET kills = "%s" WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (cstats, self._map, c.id, weapon[1]))
                         c.message('You have a new map record for ^2%s^7: ^5%s' % (weapon[0], cstats))
-                        self.debug(kills)
                 mapstats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 
     def checkmap(self):
@@ -212,9 +207,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         key1 = weapon[1]
         key2 = weapon[1]
         pos = weapon[2]
-        q=("UPDATE weaponrecord SET `%s` = %s+1 WHERE client_id = '%s'" % (key1, key2, client.id))
-        self.debug(q)
-        self.console.storage.query(q)
+        self.console.storage.query("UPDATE weaponrecord SET `%s` = %s+1 WHERE client_id = '%s'" % (key1, key2, client.id))
         mapstats = self.getMapStats(client)
         mapstats[pos] += 1
         
