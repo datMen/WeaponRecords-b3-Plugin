@@ -309,6 +309,57 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 time.sleep(1)
 
         return
+    
+    def cmd_weaponmaprecords(self, data, client, cmd=None):
+        """\
+        <weapon> <number> <map> - list the top 3 players with the selected weapon on the current map
+        """
+        if not data:
+            client.message('Invalid syntax, try !h weaponmaprecords')
+            return False
         
-class MapStats():
-    stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        input = self._adminPlugin.parseUserCmd(data)
+        map = input[1]
+        limit = input[1]
+        if limit:
+            try:
+                regex = re.compile(r"""^(?P<string>\w+) (?P<number>\d+)$""");
+                match = regex.match(data)
+
+                weapon = self.findWeapon(match.group('string'), client)
+                limit = int(match.group('number'))
+                thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd))
+            except:
+                weapon = self.findWeapon(input[0], client)
+                limit = 3
+                thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, map, cmd))
+        else:
+            weapon = self.findWeapon(input[0], client)
+            limit = 3
+            thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd))
+    
+    def doTopMapList(self, data, limit, client, weapon, map, cmd=None):
+        if limit > 10:
+            limit = 10
+        cursor = self.console.storage.query("""SELECT c.id, c.name, w.* 
+                                            FROM weaponmaprecord w, clients c  
+                                            WHERE c.id = w.client_id 
+                                            AND w.map = "%s"
+                                            AND w.weapon = "%s"
+                                            AND c.id NOT IN ( SELECT distinct(c.id) FROM penalties p, clients c WHERE (p.type = "Ban" OR p.type = "TempBan") AND inactive = 0 AND p.client_id = c.id  AND ( p.time_expire = -1 OR p.time_expire > UNIX_TIMESTAMP(NOW()) ) )
+                                            ORDER BY w.kills DESC LIMIT 0, %s""" % (map, weapon[1], limit))
+        if cursor and (cursor.rowcount > 0):
+            message = '^2%s ^7Top ^5%s ^7Kills at ^3%s:' % (weapon[0], limit, map)
+            cmd.sayLoudOrPM(client, message)
+            i = 1
+            while not cursor.EOF:
+                r = cursor.getRow()
+                name = r['name']
+                score = r['kills']
+                message = '^3# %s: ^7%s : ^2%s ^7Kills' % (i, name, score)
+                cmd.sayLoudOrPM(client, message)
+                cursor.moveNext()
+                i += 1
+                time.sleep(1)
+
+        return
