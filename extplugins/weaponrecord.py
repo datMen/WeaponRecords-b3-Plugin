@@ -8,7 +8,7 @@ import b3.plugin
 
 class WeaponrecordPlugin(b3.plugin.Plugin):
     _map = ""
-    _clientvar_map = ""
+    _clientvar_map = 'map_stats_info'
     _weapons = ["knife", "desert", "beretta", "negev", "spas", "hk", "sr8", "psg", "mp5k", "ump", "he", "lr", "m4a1", "g36", "ak"]
  
     def onLoadConfig(self):
@@ -62,22 +62,33 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 mapstats = self.getMapStats(c)
                 for i in self._weapons:
                     weapon = self.findWeapon(i, c)
-                    cstats = mapstats.stats[weapon[2]]
+                    cstats = mapstats[weapon[2]]
+                    q = ('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, c.id, weapon[1]))
                     cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, c.id, weapon[1]))
+                    self.debug(q)
+                    self.debug(cursor)
                     r = cursor.getRow()
                     kills = r['kills']
-                    if kills > cstats:
-                        self.console.storage.query('UPDATE weaponmaprecord SET kills = "%s" WHERE client.id = "%s"' % (cstats, c.id))
-                        c.message('You have a new map record for ^2%s^7: ^5%s')
-                mapstats.stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    self.debug("kills: %s cstats: %s" % (kills, cstats))
+                    if cstats > kills:
+                        self.console.storage.query('UPDATE weaponmaprecord SET kills = "%s" WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (cstats, self._map, c.id, weapon[1]))
+                        c.message('You have a new map record for ^2%s^7: ^5%s' % (weapon[0], cstats))
+                        self.debug(kills)
+                mapstats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 
     def checkmap(self):
         self._map = self.console.getCvar('mapname').getString()
+        for c in self.console.clients.getClientsByLevel():
+            cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s"' % (self._map, c.id))
+            if cursor.rowcount == 0:
+                for i in self._weapons:
+                    weapon = self.findWeapon(i, c)
+                    self.console.storage.query("INSERT INTO weaponmaprecord (`map`, `client_id`, `weapon`, `kills`) VALUES ('%s', '%s', '%s', '0')" % (self._map, c.id, weapon[1]))
         
     def getMapStats(self, client):
         
         if not client.isvar(self, self._clientvar_map):
-            client.setvar(self, self._clientvar_map, MapStats())
+            client.setvar(self, self._clientvar_map, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             
         return client.var(self, self._clientvar_map).value
     
@@ -205,7 +216,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         self.debug(q)
         self.console.storage.query(q)
         mapstats = self.getMapStats(client)
-        mapstats.stats[pos] += 1
+        mapstats[pos] += 1
         
     def cmd_weaponstats(self, data, client, cmd=None):
         """\
