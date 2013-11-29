@@ -312,14 +312,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
     
     def cmd_weaponmaprecord(self, data, client, cmd=None):
         """\
-        <weapon> <number> <map> - list the top 3 players with the selected weapon on the current map
+        <weapon> (<number> or <map>) - list the top 3 players with the selected weapon at that map
         """
         if not data:
-            client.message('Invalid syntax, try !h weaponmaprecords')
+            client.message('Invalid syntax, try !h weaponmaprecord')
             return False
         
         input = self._adminPlugin.parseUserCmd(data)
-        map = input[1]
         limit = input[1]
         if limit:
             try:
@@ -331,8 +330,14 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                 thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd))
             except:
                 weapon = self.findWeapon(input[0], client)
+                map = self.console.getMapsSoundingLike(input[1])
                 limit = 3
-                thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, map, cmd))
+                if isinstance(map, basestring):
+                    thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, map, cmd))
+                elif isinstance(map, list):
+                    client.message('do you mean : %s ?' % string.join(map,', '))
+                else:
+                    client.message('^7cannot find any map like [^4%s^7].' % data)
         else:
             weapon = self.findWeapon(input[0], client)
             limit = 3
