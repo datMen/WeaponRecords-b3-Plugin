@@ -2,7 +2,7 @@
    <settings name="commands">
     <set name="weaponstats-wstats">1</set>
     <set name="weaponmapstats-wmapstats">1</set>
-    <set name="weaponrecords-wrecords">1</set>
-    <set name="weaponmaprecords-wmaprecords">1</set>
+    <set name="weapontopstats-wtopstats">1</set>
+    <set name="weaponmaptopstats-wmaptopstats">1</set>
    </settings>
 </configuration>

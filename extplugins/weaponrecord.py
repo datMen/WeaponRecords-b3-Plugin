@@ -1,5 +1,5 @@
 __author__  = 'LouK'
-__version__ = '1.0'
+__version__ = '2.0'
 
 
 import b3, threading, thread, time, re
@@ -265,7 +265,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             kills = r['kills']
             cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (kills, weapon[0], self._map))
            
-    def cmd_weaponrecords(self, data, client, cmd=None):
+    def cmd_weapontopstats(self, data, client, cmd=None):
         """\
         <weapon> - list the top 3 players with the selected weapon
         """
@@ -310,7 +310,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
 
         return
     
-    def cmd_weaponmaprecords(self, data, client, cmd=None):
+    def cmd_weaponmaptopstats(self, data, client, cmd=None):
         """\
         <weapon> <number> <map> - list the top 3 players with the selected weapon on the current map
         """
