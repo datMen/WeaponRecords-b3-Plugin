@@ -243,13 +243,16 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         cname = input[1]
         if cname:
             sclient = self._adminPlugin.findClientPrompt(cname, client)
-            mapstats = self.getMapStats(sclient)
             
-            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s ^7at ^3%s' % (weapon[0], sclient.exactName, mapstats.stats[weapon[2]], self._map))
+            cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, sclient.id, weapon[1]))
+            r = cursor.getRow()
+            kills = r['kills']
+            cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s ^7at ^3%s' % (weapon[0], sclient.exactName, kills, self._map))
         else:
-            mapstats = self.getMapStats(client)
-            
-            cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (mapstats.stats[weapon[2]], weapon[0], self._map))
+            cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, client.id, weapon[1]))
+            r = cursor.getRow()
+            kills = r['kills']
+            cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (kills, weapon[0], self._map))
            
     def cmd_weaponrecords(self, data, client, cmd=None):
         """\
