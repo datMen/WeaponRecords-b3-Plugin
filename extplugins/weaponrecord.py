@@ -255,12 +255,12 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         if cname:
             sclient = self._adminPlugin.findClientPrompt(cname, client)
             
-            cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, sclient.id, weapon[1]))
+            cursor = self.console.storage.query('SELECT kills FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, sclient.id, weapon[1]))
             r = cursor.getRow()
             kills = r['kills']
             cmd.sayLoudOrPM(client, '^2%s ^7Kills: %s ^7: ^5%s ^7at ^3%s' % (weapon[0], sclient.exactName, kills, self._map))
         else:
-            cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, client.id, weapon[1]))
+            cursor = self.console.storage.query('SELECT kills FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, client.id, weapon[1]))
             r = cursor.getRow()
             kills = r['kills']
             cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (kills, weapon[0], self._map))
