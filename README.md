@@ -11,7 +11,9 @@
 
 -
 ### Description -
-This plugin saves every kill made with every weapon at the b3's database. You can check how many kills you made with a weapon, check other's stats or see top kills with a weapon (which players are the top killers with that weapon)
+This plugin saves every kill made with every weapon at the b3's database. You can check how many kills you made with a weapon, check other's stats or see top kills with a weapon (which players are the top killers with that weapon).
+
+Also tracks weapon stats for all maps to check weapons records (who are the players that made more kills with that weapon at that map until map finishes) or your own weapon stats for the current map.
 
 -
 ### Commands -
@@ -19,5 +21,12 @@ This plugin saves every kill made with every weapon at the b3's database. You ca
 #### !weaponstats (!wstats)
 > &lt;weapon&gt; - Check your weapon stats. &lt;player&gt; to check other's stats
 
-#### !weaponrecords (!wrecords)
-> &lt;weapon&gt; - list the top 3 players with the selected weapon
+#### !weapontopstats (!wtopstats)
+> &lt;weapon&gt; &lt;number&gt; - list the top 3 players with the selected weapon
+
+
+#### !weaponmapstats (!wmapstats)
+> &lt;weapon&gt; - Check your weapon stats at the current map. &lt;player&gt; to check other's stats
+
+#### !weaponmaprecord (!wmaprecord)
+> &lt;weapon&gt; (&lt;number&gt; or &lt;map&gt;) - list the top 3 players with the selected weapon for the selected map
