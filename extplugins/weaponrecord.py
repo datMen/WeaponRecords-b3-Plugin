@@ -9,6 +9,7 @@ import b3.plugin
 class WeaponrecordPlugin(b3.plugin.Plugin):
     _map = ""
     _clientvar_map = ""
+    _weapons = ["knife", "desert", "beretta", "negev", "spas", "hk", "sr8", "psg", "mp5k", "ump", "he", "lr", "m4a1", "g36", "ak"]
  
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
@@ -45,21 +46,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         elif event.type == b3.events.EVT_CLIENT_AUTH: 
             sclient = event.client
             cursor = self.console.storage.query('SELECT * FROM `weaponrecord` WHERE `client_id` = "%s"' % (sclient.id))
+            cursor2 = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s"' % (self._map, sclient.id))
             if cursor.rowcount == 0:
                 self.console.storage.query('INSERT INTO `weaponrecord`(`client_id`) VALUES (%s)' % (sclient.id))
-            
-            r = cursor.getRow()
-            mapstats = self.getMapStats(sclient)
-            map = r[self._map]
-            regex = re.compile(r"""^(?P<stats0>\d+) (?P<stats1>\d+) (?P<stats2>\d+) (?P<stats3>\d+) (?P<stats4>\d+) (?P<stats5>\d+) (?P<stats6>\d+) (?P<stats7>\d+) (?P<stats8>\d+) (?P<stats9>\d+) (?P<stats10>\d+) (?P<stats11>\d+) (?P<stats12>\d+) (?P<stats13>\d+) (?P<stats14>\d+)$""");
-            match = regex.match(map)
-            stats = []
-            i = 0
-            while i <= 14:
-                stats.insert(1, (int(match.group('stats%s' % i))))
-                i += 1
-            mapstats.stats = stats
-            
+            if cursor2.rowcount == 0:
+                for i in self._weapons:
+                    weapon = self.findWeapon(i, sclient)
+                    self.console.storage.query("INSERT INTO weaponmaprecord (`map`, `client_id`, `weapon`, `kills`) VALUES ('%s', '%s', '%s', '0')" % (self._map, sclient.id, weapon[1]))
                 
         elif event.type == b3.events.EVT_GAME_ROUND_START:
             self.checkmap()
@@ -67,26 +60,19 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         elif event.type == b3.events.EVT_GAME_EXIT:
             for c in self.console.clients.getClientsByLevel():
                 mapstats = self.getMapStats(c)
-                fstats = "%s" % (((("".join("%s" % mapstats.stats)).replace(",", "")).replace("[", "")).replace("]", ""))
-                self.console.storage.query('UPDATE weaponrecord SET %s = "%s" WHERE client.id = "%s"' % (self._map, fstats, c.id))
-                sql = self.console.storage.query('SELECT %s FROM weaponrecord WHERE client.id = "%s"' % (self._map, c.id))
-                regex = re.compile(r"""^(?P<stats0>\d+) (?P<stats1>\d+) (?P<stats2>\d+) (?P<stats3>\d+) (?P<stats4>\d+) (?P<stats5>\d+) (?P<stats6>\d+) (?P<stats7>\d+) (?P<stats8>\d+) (?P<stats9>\d+) (?P<stats10>\d+) (?P<stats11>\d+) (?P<stats12>\d+) (?P<stats13>\d+) (?P<stats14>\d+)$""");
-                match = regex.match(sql)
-                stats = []
-                i = 0
-                while i <= 14:
-                    stats.insert(1, (int(match.group('stats%s' % i))))
-                    i += 1
-                mapstats.stats = stats
+                for i in self._weapons:
+                    weapon = self.findWeapon(i, c)
+                    cstats = mapstats.stats[weapon[2]]
+                    cursor = self.console.storage.query('SELECT * FROM weaponmaprecord WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (self._map, c.id, weapon[1]))
+                    r = cursor.getRow()
+                    kills = r['kills']
+                    if kills > cstats:
+                        self.console.storage.query('UPDATE weaponmaprecord SET kills = "%s" WHERE client.id = "%s"' % (cstats, c.id))
+                        c.message('You have a new map record for ^2%s^7: ^5%s')
+                mapstats.stats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 
     def checkmap(self):
         self._map = self.console.getCvar('mapname').getString()
-        cursor = self.console.storage.query('SELECT * FROM `weaponrecord`')
-        r = cursor.getRow()
-        try:
-            mapname = r[self._map]
-        except KeyError:
-            self.console.storage.query('ALTER TABLE weaponrecord ADD COLUMN  %s varchar(100) DEFAULT "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"' % (self._map))
         
     def getMapStats(self, client):
         
@@ -156,7 +142,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             name = "IMI Negev"
             key = "negev"
             pos = 12
-        elif (weapon == "M4") or (weapon == "m4") or (weapon == "m4a") or (weapon == "M4A"):
+        elif (weapon == "M4") or (weapon == "m4") or (weapon == "m4a") or (weapon == "M4A") or (weapon == "m4a1"):
             name = "Colt M4A1"
             key = "m4a1"
             pos = 7
