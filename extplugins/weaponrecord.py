@@ -310,7 +310,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
 
         return
     
-    def cmd_weaponmaptopstats(self, data, client, cmd=None):
+    def cmd_weaponmaprecord(self, data, client, cmd=None):
         """\
         <weapon> <number> <map> - list the top 3 players with the selected weapon on the current map
         """
