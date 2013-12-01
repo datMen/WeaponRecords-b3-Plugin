@@ -2,7 +2,7 @@ __author__  = 'LouK'
 __version__ = '2.0'
 
 
-import b3, threading, thread, time, re
+import b3, threading, thread, time, re, string
 import b3.events
 import b3.plugin
 
