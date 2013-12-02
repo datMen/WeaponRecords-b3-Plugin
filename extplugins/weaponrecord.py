@@ -9,7 +9,7 @@ import b3.plugin
 class WeaponrecordPlugin(b3.plugin.Plugin):
     _map = ""
     _clientvar_map = 'map_stats_info'
-    _weapons = ["knife", "desert", "beretta", "negev", "spas", "hk", "sr8", "psg", "mp5k", "ump", "he", "lr", "m4a1", "g36", "ak"]
+    _weapons = ["knife", "desert", "beretta", "negev", "spas", "hk", "sr8", "psg", "mp5k", "ump", "he", "lr", "m4a1", "g36", "ak", "glock", "colt", "mac"]
  
     def onLoadConfig(self):
         self.registerEvent(b3.events.EVT_CLIENT_KILL)
@@ -69,7 +69,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                     if cstats > kills:
                         self.console.storage.query('UPDATE weaponmaprecord SET kills = "%s" WHERE map = "%s" AND client_id = "%s" AND weapon = "%s"' % (cstats, self._map, c.id, weapon[1]))
                         c.message('You have a new map record for ^2%s^7: ^5%s' % (weapon[0], cstats))
-                mapstats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                mapstats = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 
     def checkmap(self):
         self._map = self.console.getCvar('mapname').getString()
@@ -83,7 +83,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
     def getMapStats(self, client):
         
         if not client.isvar(self, self._clientvar_map):
-            client.setvar(self, self._clientvar_map, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            client.setvar(self, self._clientvar_map, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             
         return client.var(self, self._clientvar_map).value
     
@@ -156,6 +156,18 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             name = "HE Grenade"
             key = "he"
             pos = 14
+        elif (weapon == "GLOCK") or (weapon == "glock") or (weapon == "GL") or (weapon == "gl"):
+            name = "Glock 18"
+            key = "glock"
+            pos = 15
+        elif (weapon == "COLT") or (weapon == "colt") or (weapon == "co") or (weapon == "CO") or (weapon == "col"):
+            name = "Colt 1911"
+            key = "colt"
+            pos = 16
+        elif (weapon == "MAC") or (weapon == "mac") or (weapon == "MAC-11") or (weapon == "mac-11"):
+            name = "MAC-11"
+            key = "mac"
+            pos = 17
         else:
             client.message('^2%s ^7is not a weapon' % weapon)
             return False
@@ -200,6 +212,12 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             key = "g36"
         elif data[1] == self.console.UT_MOD_AK103:
             key = "ak"
+        elif data[1] == self.console.UT_MOD_GLOCK:
+            key = "glock"
+        elif data[1] == self.console.UT_MOD_COLT1911:
+            key = "colt"
+        elif data[1] == self.console.UT_MOD_MAC11:
+            key = "mac"
         else:
             return False
         
