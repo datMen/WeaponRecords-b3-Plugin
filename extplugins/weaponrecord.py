@@ -276,7 +276,7 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             kills = r['kills']
             cmd.sayLoudOrPM(client, '^7You made ^5%s ^7kills with the ^2%s ^7at ^3%s' % (kills, weapon[0], self._map))
            
-    def cmd_weapontopstats(self, data, client, cmd=None):
+    def cmd_weapontopstats(self, data, client, cmd=None, ext=False):
         """\
         <weapon> - list the top 3 players with the selected weapon
         """
@@ -295,9 +295,9 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
             weapon = self.findWeapon(input[0], client)
             limit = 3
         
-        thread.start_new_thread(self.doTopList, (data, limit, client, weapon, cmd))
+        thread.start_new_thread(self.doTopList, (data, limit, client, weapon, cmd, ext))
     
-    def doTopList(self, data, limit, client, weapon, cmd=None):
+    def doTopList(self, data, limit, client, weapon, cmd=None, ext=False):
         if limit > 10:
             limit = 10
         cursor = self.console.storage.query("""SELECT c.id, c.name, w.* 
@@ -307,21 +307,27 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                                             ORDER BY w.%s DESC LIMIT 0, %s""" % (weapon[1], limit))
         if cursor and (cursor.rowcount > 0):
             message = '^2%s ^7Top ^5%s ^7Kills:' % (weapon[0], limit)
-            cmd.sayLoudOrPM(client, message)
+            if ext:
+                self.console.say(message)
+            else:
+                cmd.sayLoudOrPM(client, message)
             i = 1
             while not cursor.EOF:
                 r = cursor.getRow()
                 name = r['name']
                 score = r[weapon[1]]
                 message = '^3# %s: ^7%s : ^2%s ^7Kills' % (i, name, score)
-                cmd.sayLoudOrPM(client, message)
+                if ext:
+                    self.console.say(message)
+                else:
+                    cmd.sayLoudOrPM(client, message)
                 cursor.moveNext()
                 i += 1
                 time.sleep(1)
 
         return
     
-    def cmd_weaponmaprecord(self, data, client, cmd=None):
+    def cmd_weaponmaprecord(self, data, client, cmd=None, ext=False):
         """\
         <weapon> (<number> or <map>) - list the top 3 players with the selected weapon at that map
         """
@@ -338,13 +344,13 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
 
                 weapon = self.findWeapon(match.group('string'), client)
                 limit = int(match.group('number'))
-                thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd))
+                thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd, ext))
             except:
                 weapon = self.findWeapon(input[0], client)
                 map = self.console.getMapsSoundingLike(input[1])
                 limit = 3
                 if isinstance(map, basestring):
-                    thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, map, cmd))
+                    thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, map, cmd, ext))
                 elif isinstance(map, list):
                     client.message('do you mean : %s ?' % string.join(map,', '))
                 else:
@@ -352,9 +358,9 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
         else:
             weapon = self.findWeapon(input[0], client)
             limit = 3
-            thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd))
+            thread.start_new_thread(self.doTopMapList, (data, limit, client, weapon, self._map, cmd, ext))
     
-    def doTopMapList(self, data, limit, client, weapon, map, cmd=None):
+    def doTopMapList(self, data, limit, client, weapon, map, cmd=None, ext=False):
         if limit > 10:
             limit = 10
         cursor = self.console.storage.query("""SELECT c.id, c.name, w.* 
@@ -366,14 +372,20 @@ class WeaponrecordPlugin(b3.plugin.Plugin):
                                             ORDER BY w.kills DESC LIMIT 0, %s""" % (map, weapon[1], limit))
         if cursor and (cursor.rowcount > 0):
             message = '^2%s ^7Top ^5%s ^7Kills at ^3%s:' % (weapon[0], limit, map)
-            cmd.sayLoudOrPM(client, message)
+            if ext:
+                self.console.say(message)
+            else:
+                cmd.sayLoudOrPM(client, message)
             i = 1
             while not cursor.EOF:
                 r = cursor.getRow()
                 name = r['name']
                 score = r['kills']
                 message = '^3# %s: ^7%s : ^2%s ^7Kills' % (i, name, score)
-                cmd.sayLoudOrPM(client, message)
+                if ext:
+                    self.console.say(message)
+                else:
+                    cmd.sayLoudOrPM(client, message)
                 cursor.moveNext()
                 i += 1
                 time.sleep(1)
