@@ -5,4 +5,8 @@
     <set name="weapontopstats-wtopstats">1</set>
     <set name="weaponmaprecord-wmaprecord">1</set>
    </settings>
+   <settings name="messages">
+    <set name="records_end_map">True</set>
+    <set name="personal_records_end_map">False</set>
+   </settings>
 </configuration>
